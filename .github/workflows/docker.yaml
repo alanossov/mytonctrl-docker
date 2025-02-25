@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
+        uses: actions/checkout@v4
+        #with:
+        #  submodules: 'recursive'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -32,26 +32,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get next tag
-        id: tag
-        run: |
-          git fetch --all --tags
-          git tag -l
-          NEW_TAG=v$(date +'%Y.%m')
-          FOUND=$(git tag -l | grep $NEW_TAG | wc -l)
-          if [ $FOUND -eq 0 ]; then
-            echo "TAG=$NEW_TAG" >> $GITHUB_OUTPUT
-          else
-            echo "TAG=$NEW_TAG-$FOUND" >> $GITHUB_OUTPUT
-          fi
+      - name: Get the Ref
+        id: get-ref
+        uses: ankitvgupta/ref-to-tag-action@master
+        with:
+          ref: ${{ github.ref }}
+          head_ref: ${{ github.head_ref }}
 
-      - name: Build and push
-        id: docker_build
+      - name: set image-version
+        id: set-image-version
+        run: |
+          echo "IMAGE_VERSION=${{ steps.get-ref.outputs.tag }}-${{ env.SHA_SHORT }}" >> $GITHUB_ENV
+          echo "::set-output name=image-version::${{ steps.get-ref.outputs.tag }}-${{ env.SHA_SHORT }}"
+
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          context: ./
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.TAG }}
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.set-image-version.outputs.image-version }}
