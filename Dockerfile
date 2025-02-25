@@ -12,10 +12,10 @@ RUN wget https://apt.llvm.org/llvm.sh && \
     ln /usr/bin/clang-16 /usr/bin/clang && \
     ln /usr/bin/clang++-16 /usr/bin/clang++
 
-ARG MYTONCTRL_VERSION=master
+ARG MYTONCTRL_VERSION=v2.4.0
 ARG TELEMETRY=false
-ARG DUMP=false
-ARG MODE=validator
+ARG DUMP=true
+ARG MODE=liteserver
 ARG IGNORE_MINIMAL_REQS=true
 ARG GLOBAL_CONFIG_URL=https://ton.org/global.config.json
 
