@@ -1,0 +1,19 @@
+FROM ubuntu:24.04
+
+RUN apt -qq update
+
+#RUN mv /usr/lib/python3.12/EXTERNALLY-MANAGED /usr/lib/python3.12/EXTERNALLY-MANAGED.old
+RUN apt -qq install wget systemd python3-pip -y > /dev/null
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
+
+RUN apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
+
+RUN mkdir /mytonctrl
+RUN wget -q https://raw.githubusercontent.com/ton-blockchain/mytonctrl/master/scripts/install.sh -O /mytonctrl/install.sh
+
+RUN bash /mytonctrl/install.sh -o -t -i -b v2.4.0 -p /mytonctrl
