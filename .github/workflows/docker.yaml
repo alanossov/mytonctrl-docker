@@ -6,10 +6,6 @@ on:
     branches:
       - 'main'
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   build-and-push:
     runs-on: ubuntu-22.04
@@ -32,18 +28,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get the Ref
-        id: get-ref
-        uses: ankitvgupta/ref-to-tag-action@master
-        with:
-          ref: ${{ github.ref }}
-          head_ref: ${{ github.head_ref }}
-
-      - name: set image-version
-        id: set-image-version
-        run: |
-          echo "IMAGE_VERSION=${{ steps.get-ref.outputs.tag }}-${{ env.SHA_SHORT }}" >> $GITHUB_ENV
-          echo "::set-output name=image-version::${{ steps.get-ref.outputs.tag }}-${{ env.SHA_SHORT }}"
+      - name: create env vars
+        uses: rlespinasse/github-slug-action@v4
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
@@ -52,8 +38,8 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          #cache-from: type=gha
+          #cache-to: type=gha,mode=max
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ steps.set-image-version.outputs.image-version }}
+            ghcr.io/${{ github.repository }}:${{ env.GITHUB_REF_SLUG }}-${{ env.GITHUB_SHA_SHORT }}
