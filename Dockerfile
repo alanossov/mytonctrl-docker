@@ -19,6 +19,8 @@ ARG MODE=liteserver
 ARG IGNORE_MINIMAL_REQS=true
 ARG GLOBAL_CONFIG_URL=https://ton.org/global.config.json
 
+RUN python3 -m pip install --upgrade pip
+
 RUN cp /usr/local/bin/lite-client /usr/bin/ton/lite-client/ \
     && cp /usr/local/bin/validator-engine /usr/bin/ton/validator-engine \
     && cp /usr/local/bin/validator-engine-console /usr/bin/ton/validator-engine-console/ \
@@ -40,8 +42,6 @@ RUN wget -nv https://raw.githubusercontent.com/gdraheim/docker-systemctl-replace
     && sed -i 's/\[Service\]/\[Service\]\nStandardOutput=null\nStandardError=syslog/' /etc/systemd/system/validator.service \
     && sed -i 's/\[Service\]/\[Service\]\nStandardOutput=null\nStandardError=syslog/' /etc/systemd/system/mytoncore.service \
     && rm -rf /var/lib/apt/lists/* && rm -rf /root/.cache/pip VOLUME ["/var/ton-work", "/usr/local/bin/mytoncore"]
-
-RUN python3 -m pip install --no-cache-dir --disable-pip-version-check mytonctrl
 
 COPY --chmod=755 scripts/entrypoint.sh/ /scripts/entrypoint.sh
 
