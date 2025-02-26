@@ -41,6 +41,8 @@ RUN wget -nv https://raw.githubusercontent.com/gdraheim/docker-systemctl-replace
     && sed -i 's/\[Service\]/\[Service\]\nStandardOutput=null\nStandardError=syslog/' /etc/systemd/system/mytoncore.service \
     && rm -rf /var/lib/apt/lists/* && rm -rf /root/.cache/pip VOLUME ["/var/ton-work", "/usr/local/bin/mytoncore"]
 
+RUN python3 -m pip install --no-cache-dir --disable-pip-version-check mytonctrl
+
 COPY --chmod=755 scripts/entrypoint.sh/ /scripts/entrypoint.sh
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]
