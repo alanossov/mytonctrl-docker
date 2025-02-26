@@ -12,7 +12,7 @@ RUN wget https://apt.llvm.org/llvm.sh && \
     ln /usr/bin/clang-16 /usr/bin/clang && \
     ln /usr/bin/clang++-16 /usr/bin/clang++
 
-ARG MYTONCTRL_VERSION=v2.4.0
+ARG MYTONCTRL_VERSION=master
 ARG TELEMETRY=false
 ARG DUMP=true
 ARG MODE=liteserver
@@ -32,7 +32,7 @@ RUN cp /usr/local/bin/lite-client /usr/bin/ton/lite-client/ \
 
 RUN wget -nv https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl3.py -O /usr/bin/systemctl \
     && chmod +x /usr/bin/systemctl \
-    && wget https://raw.githubusercontent.com/ton-blockchain/mytonctrl/${MYTONCTRL_VERSION}/scripts/install.sh -O /tmp/install.sh \
+    && wget https://raw.githubusercontent.com/alanossov/mytonctrl/${MYTONCTRL_VERSION}/scripts/install.sh -O /tmp/install.sh \
     && wget -nv ${GLOBAL_CONFIG_URL} -O /usr/bin/ton/global.config.json \
     && if [ "$TELEMETRY" = false ]; then export TELEMETRY="-t"; else export TELEMETRY=""; fi && if [ "$IGNORE_MINIMAL_REQS" = true ]; then export IGNORE_MINIMAL_REQS="-i"; else export IGNORE_MINIMAL_REQS=""; fi \
     && /bin/bash /tmp/install.sh ${TELEMETRY} ${IGNORE_MINIMAL_REQS} -b ${MYTONCTRL_VERSION} -m ${MODE} \
